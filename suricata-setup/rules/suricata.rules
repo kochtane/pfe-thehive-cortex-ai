@@ -109,8 +109,8 @@ alert http any any -> any 8081 (msg:"Auth brute force on 8081"; flow:established
 # ====================================================================
 # TEST COMMANDS THAT WILL TRIGGER ALERTS
 # ====================================================================
-# curl "http://192.168.100.75:8081/?query=DROP"           -> Rule 1000001
-# curl "http://192.168.100.75:8081/?id=1' OR 1=1"        -> Rule 1000004, 1000007
-# curl "http://192.168.100.75:8081/?q=<script>alert(1)"  -> Rule 1000008, 1000010
-# FOR /L %i IN (1,1,15) DO curl http://192.168.100.75:8081/ -> Rule 1000022
-# curl "http://192.168.100.75:8081/admin"                -> Rule 1000027
+# curl "<url-system-under-test>/?query=DROP"           -> Rule 1000001
+# curl "<url-system-under-test>/?id=1' OR 1=1"        -> Rule 1000004, 1000007
+# curl "<url-system-under-test>/?q=<script>alert(1)"  -> Rule 1000008, 1000010
+# FOR /L %i IN (1,1,15) DO curl <url-system-under-test>/ -> Rule 1000022
+# curl "<url-system-under-test>/admin"                -> Rule 1000027
