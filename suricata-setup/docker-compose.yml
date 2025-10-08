@@ -1,0 +1,59 @@
+version: '3.8'
+services:
+  # Nginx web server
+  nginx:
+    image: nginx:latest
+    container_name: nginx-server
+    network_mode: host
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+  
+  # Suricata for DDoS detection
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata-monitor
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE
+    volumes:
+      - suricata-logs:/var/log/suricata
+      - ./rules:/var/lib/suricata/rules:ro
+    command: ["suricata", "-i", "ens33", "-v"]
+    restart: unless-stopped
+  
+  # AI-Enhanced Alert processor for TheHive integration
+  thehive-alerter:
+    image: python:3.9-slim
+    container_name: thehive-alerter
+    network_mode: host
+    volumes:
+      - ./alerter.py:/app/alerter.py:ro
+      - suricata-logs:/var/log/suricata:ro
+    working_dir: /app
+    # FIXED: Install OpenAI and other dependencies
+    command: >
+      bash -c "
+      echo '🚀 Starting AI-enhanced alerter container...' &&
+      pip install --no-cache-dir --upgrade pip &&
+      pip install --no-cache-dir requests watchdog openai>=1.0.0 &&
+      echo '✅ All dependencies (including OpenAI) installed successfully' &&
+      echo '🎯 Starting AI-enhanced alerter script...' &&
+      python alerter.py
+      "
+    environment:
+      - THEHIVE_URL=<the-hive-url>
+      - THEHIVE_API_KEY=<the-hive-api-key>
+      # Add your OpenAI API key here
+      - OPENAI_API_KEY=<open-ai-api-key>
+      - OPENAI_MODEL=gpt-3.5-turbo
+      - TESTING_MODE=true
+      - SESSION_WINDOW_SECONDS=10
+      - AI_DEBUG=true
+    depends_on:
+      - suricata
+    restart: unless-stopped
+
+volumes:
+  suricata-logs:

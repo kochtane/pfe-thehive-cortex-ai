@@ -1,0 +1,116 @@
+# ====================================================================
+# PORT 8081 FOCUSED SURICATA RULES - WORKING SQL INJECTION DETECTION
+# ====================================================================
+
+# ====================================================================
+# SQL INJECTION DETECTION - PORT 8081 ONLY
+# ====================================================================
+
+# 1. SQL INJECTION - Individual patterns (will catch your DROP test)
+alert http any any -> any 8081 (msg:"SQL injection DROP attempt"; flow:established,to_server; content:"DROP"; http_uri; nocase; sid:1000001; rev:1;)
+alert http any any -> any 8081 (msg:"SQL injection UNION attempt"; flow:established,to_server; content:"UNION"; http_uri; nocase; sid:1000002; rev:1;)
+alert http any any -> any 8081 (msg:"SQL injection SELECT attempt"; flow:established,to_server; content:"SELECT"; http_uri; nocase; sid:1000003; rev:1;)
+alert http any any -> any 8081 (msg:"SQL injection OR bypass"; flow:established,to_server; content:" OR "; http_uri; nocase; sid:1000004; rev:1;)
+alert http any any -> any 8081 (msg:"SQL injection AND bypass"; flow:established,to_server; content:" AND "; http_uri; nocase; sid:1000005; rev:1;)
+alert http any any -> any 8081 (msg:"SQL injection comment"; flow:established,to_server; content:"--"; http_uri; sid:1000006; rev:1;)
+alert http any any -> any 8081 (msg:"SQL injection single quote"; flow:established,to_server; content:"'"; http_uri; sid:1000007; rev:1;)
+
+# ====================================================================
+# XSS DETECTION - PORT 8081 ONLY
+# ====================================================================
+
+# 2. XSS ATTACKS
+alert http any any -> any 8081 (msg:"XSS script tag"; flow:established,to_server; content:"<script"; http_uri; nocase; sid:1000008; rev:1;)
+alert http any any -> any 8081 (msg:"XSS javascript protocol"; flow:established,to_server; content:"javascript:"; http_uri; nocase; sid:1000009; rev:1;)
+alert http any any -> any 8081 (msg:"XSS alert function"; flow:established,to_server; content:"alert("; http_uri; nocase; sid:1000010; rev:1;)
+alert http any any -> any 8081 (msg:"XSS document.cookie"; flow:established,to_server; content:"document.cookie"; http_uri; nocase; sid:1000011; rev:1;)
+
+# ====================================================================
+# COMMAND INJECTION - PORT 8081 ONLY
+# ====================================================================
+
+# 3. COMMAND INJECTION
+alert http any any -> any 8081 (msg:"Command injection pipe"; flow:established,to_server; content:"|"; http_uri; sid:1000012; rev:1;)
+alert http any any -> any 8081 (msg:"Command injection semicolon"; flow:established,to_server; content:";"; http_uri; sid:1000013; rev:1;)
+alert http any any -> any 8081 (msg:"Command injection backtick"; flow:established,to_server; content:"`"; http_uri; sid:1000014; rev:1;)
+alert http any any -> any 8081 (msg:"Command injection ampersand"; flow:established,to_server; content:"&"; http_uri; sid:1000015; rev:1;)
+
+# ====================================================================
+# DIRECTORY TRAVERSAL - PORT 8081 ONLY
+# ====================================================================
+
+# 4. DIRECTORY TRAVERSAL
+alert http any any -> any 8081 (msg:"Directory traversal attempt"; flow:established,to_server; content:"../"; http_uri; sid:1000016; rev:1;)
+alert http any any -> any 8081 (msg:"Windows directory traversal"; flow:established,to_server; content:"..\\"; http_uri; sid:1000017; rev:1;)
+
+# ====================================================================
+# AUTOMATED TOOL DETECTION - PORT 8081 ONLY
+# ====================================================================
+
+# 5. SECURITY SCANNERS
+alert http any any -> any 8081 (msg:"Nikto scanner on 8081"; flow:established,to_server; content:"nikto"; http_user_agent; nocase; sid:1000018; rev:1;)
+alert http any any -> any 8081 (msg:"SQLMap scanner on 8081"; flow:established,to_server; content:"sqlmap"; http_user_agent; nocase; sid:1000019; rev:1;)
+alert http any any -> any 8081 (msg:"Nmap scanner on 8081"; flow:established,to_server; content:"nmap"; http_user_agent; nocase; sid:1000020; rev:1;)
+alert http any any -> any 8081 (msg:"Burp Suite on 8081"; flow:established,to_server; content:"burp"; http_user_agent; nocase; sid:1000021; rev:1;)
+
+# ====================================================================
+# AUTOMATED REQUEST FLOODS - PORT 8081 ONLY
+# ====================================================================
+
+# 6. YOUR FOR LOOP TEST
+alert http any any -> any 8081 (msg:"Rapid curl requests on 8081"; flow:to_server; content:"curl"; http_user_agent; threshold: type limit, track by_src, count 8, seconds 3; sid:1000022; rev:1;)
+
+# 7. GENERAL HTTP FLOOD ON 8081
+alert http any any -> any 8081 (msg:"HTTP flood on port 8081"; flow:to_server; content:"GET"; http_method; threshold: type limit, track by_src, count 25, seconds 5; sid:1000023; rev:1;)
+
+# 8. POST FLOOD ON 8081
+alert http any any -> any 8081 (msg:"POST flood on port 8081"; flow:established,to_server; content:"POST"; http_method; threshold: type limit, track by_src, count 15, seconds 5; sid:1000024; rev:1;)
+
+# ====================================================================
+# SUSPICIOUS PATTERNS - PORT 8081 ONLY  
+# ====================================================================
+
+# 9. SUSPICIOUS USER AGENTS
+alert http any any -> any 8081 (msg:"Python requests on 8081"; flow:established,to_server; content:"python-requests"; http_user_agent; nocase; sid:1000025; rev:1;)
+alert http any any -> any 8081 (msg:"Wget tool on 8081"; flow:established,to_server; content:"wget"; http_user_agent; nocase; sid:1000026; rev:1;)
+
+# 10. SUSPICIOUS PATHS
+alert http any any -> any 8081 (msg:"Admin path access"; flow:established,to_server; content:"/admin"; http_uri; nocase; sid:1000027; rev:1;)
+alert http any any -> any 8081 (msg:"Config file access"; flow:established,to_server; content:".conf"; http_uri; nocase; sid:1000028; rev:1;)
+alert http any any -> any 8081 (msg:"Backup file access"; flow:established,to_server; content:".bak"; http_uri; nocase; sid:1000029; rev:1;)
+
+# ====================================================================
+# FILE UPLOAD ATTACKS - PORT 8081 ONLY
+# ====================================================================
+
+# 11. MALICIOUS FILE UPLOADS
+alert http any any -> any 8081 (msg:"PHP file upload attempt"; flow:established,to_server; content:".php"; http_uri; nocase; sid:1000030; rev:1;)
+alert http any any -> any 8081 (msg:"JSP file upload attempt"; flow:established,to_server; content:".jsp"; http_uri; nocase; sid:1000031; rev:1;)
+alert http any any -> any 8081 (msg:"ASP file upload attempt"; flow:established,to_server; content:".asp"; http_uri; nocase; sid:1000032; rev:1;)
+
+# ====================================================================
+# BRUTE FORCE DETECTION - PORT 8081 ONLY
+# ====================================================================
+
+# 12. LOGIN BRUTE FORCE
+alert http any any -> any 8081 (msg:"Login brute force on 8081"; flow:established,to_server; content:"login"; http_uri; nocase; threshold: type limit, track by_src, count 10, seconds 60; sid:1000033; rev:1;)
+alert http any any -> any 8081 (msg:"Auth brute force on 8081"; flow:established,to_server; content:"auth"; http_uri; nocase; threshold: type limit, track by_src, count 10, seconds 60; sid:1000034; rev:1;)
+
+# ====================================================================
+# ALL OTHER PORTS AND PROTOCOLS IGNORED
+# ====================================================================
+# This ruleset ONLY monitors port 8081
+# No SSH monitoring (port 22)
+# No web browsing monitoring (ports 80, 443, 9000, etc.)
+# No DNS monitoring
+# No general port scanning
+# No other service monitoring
+
+# ====================================================================
+# TEST COMMANDS THAT WILL TRIGGER ALERTS
+# ====================================================================
+# curl "http://192.168.100.75:8081/?query=DROP"           -> Rule 1000001
+# curl "http://192.168.100.75:8081/?id=1' OR 1=1"        -> Rule 1000004, 1000007
+# curl "http://192.168.100.75:8081/?q=<script>alert(1)"  -> Rule 1000008, 1000010
+# FOR /L %i IN (1,1,15) DO curl http://192.168.100.75:8081/ -> Rule 1000022
+# curl "http://192.168.100.75:8081/admin"                -> Rule 1000027
