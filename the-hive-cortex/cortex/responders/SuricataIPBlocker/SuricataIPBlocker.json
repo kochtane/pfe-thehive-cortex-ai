@@ -1,0 +1,47 @@
+{
+  "name": "SuricataIPBlocker",
+  "version": "1.0",
+  "author": "Orange Tunisie Security Team",
+  "url": "https://github.com/your-org/ai-enhanced-responders",
+  "license": "AGPL-V3",
+  "description": "AI-Enhanced IP blocker with OpenAI decision making for intelligent threat response",
+  "dataTypeList": ["thehive:case", "thehive:alert", "thehive:case_task", "ip"],
+  "maxTlp": 3,
+  "maxPap": 3,
+  "command": "SuricataIPBlocker/suricata_ip_blocker.py",
+  "baseConfig": "SuricataIPBlocker",
+  "configurationItems": [
+    {
+      "name": "ip_to_block",
+      "description": "IP address to block (leave empty for AI-powered auto-detection from observables)",
+      "type": "string",
+      "multi": false,
+      "required": false,
+      "defaultValue": ""
+    },
+    {
+      "name": "target_port",
+      "description": "Port to block (default: 8081)",
+      "type": "string",
+      "multi": false,
+      "required": false,
+      "defaultValue": "8081"
+    },
+    {
+      "name": "block_duration_hours",
+      "description": "How long to block IPs (hours) - for documentation only",
+      "type": "number",
+      "multi": false,
+      "required": false,
+      "defaultValue": 24
+    },
+    {
+      "name": "ai_enabled",
+      "description": "Enable AI-powered decision making (requires OpenAI API key)",
+      "type": "boolean",
+      "multi": false,
+      "required": false,
+      "defaultValue": true
+    }
+  ]
+}
